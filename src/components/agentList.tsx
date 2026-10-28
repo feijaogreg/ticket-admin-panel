@@ -1,14 +1,22 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { SupportAgent } from "@/types/supportCase";
 import { useSupportData } from "@/context/supportData";
 import { Badge } from "@/components/ui/badge";
+import { SearchInput } from "@/components/ui/searchInput";
 import { SortableTable } from "@/components/ui/sortableTable";
 import type { Column } from "@/components/ui/sortableTable";
 import { CATEGORY_MAP } from "@/lib/badgeMaps";
+import { matchesAgent } from "@/lib/search";
 import { EmptyState, ErrorState, LoadingState } from "./dataState";
 
 export function AgentList() {
   const { agents, cases, status, error, reload } = useSupportData();
+  const [query, setQuery] = useState("");
+
+  const filteredAgents = useMemo(
+    () => agents.filter((agent) => matchesAgent(agent, query)),
+    [agents, query],
+  );
 
   const activeTicketCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -69,11 +77,21 @@ export function AgentList() {
   }
 
   return (
-    <SortableTable
-      label="Agents"
-      rows={agents}
-      columns={columns}
-      getRowKey={(agent) => agent.id}
-    />
+    <>
+      <SearchInput
+        label="Search agents"
+        placeholder="Name or email"
+        value={query}
+        onChange={setQuery}
+        resultSummary={`${filteredAgents.length} of ${agents.length} agents`}
+      />
+      <SortableTable
+        label="Agents"
+        rows={filteredAgents}
+        columns={columns}
+        getRowKey={(agent) => agent.id}
+        emptyMessage="No results. Try a different search."
+      />
+    </>
   );
 }

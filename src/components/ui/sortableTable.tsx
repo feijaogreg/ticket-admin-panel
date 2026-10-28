@@ -22,6 +22,8 @@ interface SortableTableProps<T> {
   columns: Column<T>[];
   getRowKey: (row: T) => string;
   onRowClick?: (row: T) => void;
+  /** Shown in a full-width row when `rows` is empty, keeping the header and sort in place. */
+  emptyMessage?: string;
 }
 
 export function SortableTable<T>({
@@ -30,6 +32,7 @@ export function SortableTable<T>({
   columns,
   getRowKey,
   onRowClick,
+  emptyMessage = "No results",
 }: SortableTableProps<T>) {
   const [sort, setSort] = useState<SortState | null>(null);
 
@@ -81,6 +84,13 @@ export function SortableTable<T>({
           </tr>
         </thead>
         <tbody>
+          {sortedRows.length === 0 && (
+            <tr>
+              <td colSpan={columns.length} className="table__empty">
+                {emptyMessage}
+              </td>
+            </tr>
+          )}
           {sortedRows.map((row) => (
             <tr
               key={getRowKey(row)}

@@ -1,12 +1,14 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { SupportCase } from "@/types/supportCase";
 import { useSupportData } from "@/context/supportData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SearchInput } from "@/components/ui/searchInput";
 import { SortableTable } from "@/components/ui/sortableTable";
 import type { Column } from "@/components/ui/sortableTable";
 import { CATEGORY_MAP, PRIORITY_MAP, PRIORITY_RANK, STATUS_MAP, STATUS_RANK } from "@/lib/badgeMaps";
 import { formatDate } from "@/lib/formatDate";
+import { matchesTicket } from "@/lib/search";
 import { EmptyState, ErrorState, LoadingState } from "./dataState";
 
 interface TicketListProps {
@@ -15,6 +17,12 @@ interface TicketListProps {
 
 export function TicketList({ onSelectCase }: TicketListProps) {
   const { cases: tickets, agents, status, error, reload } = useSupportData();
+  const [query, setQuery] = useState("");
+
+  const filteredTickets = useMemo(
+    () => tickets.filter((ticket) => matchesTicket(ticket, query)),
+    [tickets, query],
+  );
 
   const agentNames = useMemo(
     () => new Map(agents.map((agent) => [agent.id, `${agent.firstName} ${agent.lastName}`])),
@@ -121,12 +129,22 @@ export function TicketList({ onSelectCase }: TicketListProps) {
   }
 
   return (
-    <SortableTable
-      label="Tickets"
-      rows={tickets}
-      columns={columns}
-      getRowKey={(ticket) => ticket.id}
-      onRowClick={(ticket) => onSelectCase(ticket.id)}
-    />
+    <>
+      <SearchInput
+        label="Search tickets"
+        placeholder="Subject or description"
+        value={query}
+        onChange={setQuery}
+        resultSummary={`${filteredTickets.length} of ${tickets.length} tickets`}
+      />
+      <SortableTable
+        label="Tickets"
+        rows={filteredTickets}
+        columns={columns}
+        getRowKey={(ticket) => ticket.id}
+        onRowClick={(ticket) => onSelectCase(ticket.id)}
+        emptyMessage="No results. Try a different search."
+      />
+    </>
   );
 }
