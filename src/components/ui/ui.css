@@ -56,10 +56,16 @@
   display: inline-flex;
   align-items: center;
   border: 0;
+  gap: var(--space-2);
   border-radius: var(--radius-md);
   font-weight: var(--font-medium);
   cursor: pointer;
   transition: background-color var(--transition-fast);
+}
+
+/* Spinners inside buttons follow the button's text color. */
+.btn .spinner {
+  color: currentColor;
 }
 
 .btn:disabled {

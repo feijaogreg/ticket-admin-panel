@@ -4,6 +4,7 @@ import { useSupportData } from "@/context/supportData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import type { BadgeProps } from "@/components/ui/badge";
 
 const PRIORITY_MAP: Record<string, { label: string; variant: BadgeProps["variant"] }> = {
@@ -28,6 +29,7 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
   const [selectedAgentId, setSelectedAgentId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isAssigning, setIsAssigning] = useState(false);
 
   const { id, subject, priority, category, status, agentId, description } = supportCase;
   const priorityInfo = PRIORITY_MAP[priority];
@@ -35,14 +37,19 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
   const assignedAgent = agents.find((agent) => agent.id === agentId);
 
   async function handleAssign() {
+    if (isAssigning) return;
+
     setError("");
     setSuccess("");
+    setIsAssigning(true);
 
     try {
       await assignAgent(id, selectedAgentId);
       setSuccess("Agent Assigned");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
+    } finally {
+      setIsAssigning(false);
     }
   }
 
@@ -84,8 +91,19 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
           ))}
         </select>
 
-        <Button variant="primary" onClick={handleAssign} disabled={!selectedAgentId}>
-          Assign
+        <Button
+          variant="primary"
+          onClick={handleAssign}
+          disabled={!selectedAgentId || isAssigning}
+        >
+          {isAssigning ? (
+            <>
+              <Spinner size="sm" />
+              Assigning…
+            </>
+          ) : (
+            "Assign"
+          )}
         </Button>
 
         {error && <p className="assign-screen__error">{error}</p>}

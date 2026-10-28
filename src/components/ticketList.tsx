@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useSupportData } from "@/context/supportData";
+import { EmptyState, ErrorState, LoadingState } from "./dataState";
 import { TicketCard } from "./ticketCard";
 
 interface TicketListProps {
@@ -7,7 +8,7 @@ interface TicketListProps {
 }
 
 export function TicketList({ onSelectCase }: TicketListProps) {
-  const { cases: tickets, agents, status, error } = useSupportData();
+  const { cases: tickets, agents, status, error, reload } = useSupportData();
 
   const agentNames = useMemo(
     () => new Map(agents.map((agent) => [agent.id, `${agent.firstName} ${agent.lastName}`])),
@@ -15,24 +16,15 @@ export function TicketList({ onSelectCase }: TicketListProps) {
   );
 
   if (status === "loading") {
-    return null;
+    return <LoadingState />;
   }
 
   if (status === "error") {
-    return (
-      <div className="ticket-list-state">
-        <p>Something went wrong.</p>
-        {error && <p>{error}</p>}
-      </div>
-    );
+    return <ErrorState message={error} onRetry={reload} />;
   }
 
   if (tickets.length === 0) {
-    return (
-      <div className="ticket-list-state">
-        <p>No tickets found.</p>
-      </div>
-    );
+    return <EmptyState message="No tickets found." />;
   }
 
   return (

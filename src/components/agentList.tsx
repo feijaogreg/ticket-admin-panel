@@ -1,28 +1,20 @@
 import { useSupportData } from "@/context/supportData";
+import { EmptyState, ErrorState, LoadingState } from "./dataState";
 import { AgentCard } from "./agentCard";
 
 export function AgentList() {
-  const { agents, status, error } = useSupportData();
+  const { agents, status, error, reload } = useSupportData();
 
   if (status === "loading") {
-    return null;
+    return <LoadingState />;
   }
 
   if (status === "error") {
-    return (
-      <div className="ticket-list-state">
-        <p>Something went wrong.</p>
-        {error && <p>{error}</p>}
-      </div>
-    );
+    return <ErrorState message={error} onRetry={reload} />;
   }
 
   if (agents.length === 0) {
-    return (
-      <div className="ticket-list-state">
-        <p>No agents found.</p>
-      </div>
-    );
+    return <EmptyState message="No agents found." />;
   }
 
   return (
