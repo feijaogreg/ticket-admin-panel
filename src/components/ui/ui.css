@@ -84,6 +84,21 @@
   background: var(--color-primary-hover);
 }
 
+.btn--secondary {
+  background: transparent;
+  color: var(--color-text-secondary);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: var(--color-surface-tertiary);
+  color: var(--color-text);
+}
+
 .spinner {
   color: var(--color-primary);
   animation: spinner-rotate 1s linear infinite;

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { TopBar } from "./components/layout/topBar";
+import { PageHeader } from "./components/layout/pageHeader";
 import { Sidebar, type Screen } from "./components/layout/sidebar";
 import { TicketList } from "./components/ticketList";
 import { AgentList } from "./components/agentList";
@@ -20,24 +21,47 @@ export default function App() {
     setActiveScreen(screen);
   }
 
+  const backToDashboard = { label: "Back to dashboard", onClick: () => handleNavigate("dashboard") };
+
   function renderMain() {
     if (activeScreen === "dashboard") {
       return (
-        <div className="ticket-list-state">
-          <p>Dashboard — coming soon</p>
-        </div>
+        <>
+          <PageHeader title="Dashboard" />
+          <div className="ticket-list-state">
+            <p>Dashboard — coming soon</p>
+          </div>
+        </>
       );
     }
 
     if (activeScreen === "tickets") {
       if (selectedCase) {
-        return <AssignScreen supportCase={selectedCase} />;
+        return (
+          <>
+            <PageHeader
+              title="Assign agent"
+              back={{ label: "Back to tickets", onClick: () => setSelectedCaseId(null) }}
+            />
+            <AssignScreen supportCase={selectedCase} />
+          </>
+        );
       }
-      return <TicketList onSelectCase={setSelectedCaseId} />;
+      return (
+        <>
+          <PageHeader title="Tickets" back={backToDashboard} />
+          <TicketList onSelectCase={setSelectedCaseId} />
+        </>
+      );
     }
 
     if (activeScreen === "agents") {
-      return <AgentList />;
+      return (
+        <>
+          <PageHeader title="Agents" back={backToDashboard} />
+          <AgentList />
+        </>
+      );
     }
 
     return null;
