@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import type { SupportAgent } from "@/types/supportCase";
+import { useId, useMemo, useState } from "react";
+import type { CaseCategory, SupportAgent } from "@/types/supportCase";
 import { useSupportData } from "@/context/supportData";
 import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/ui/searchInput";
@@ -7,26 +7,24 @@ import { SortableTable } from "@/components/ui/sortableTable";
 import type { Column } from "@/components/ui/sortableTable";
 import { CATEGORY_MAP } from "@/lib/badgeMaps";
 import { matchesAgent } from "@/lib/search";
+import { countActiveTickets } from "@/lib/agentWorkload";
 import { EmptyState, ErrorState, LoadingState } from "./dataState";
 
 export function AgentList() {
   const { agents, cases, status, error, reload } = useSupportData();
   const [query, setQuery] = useState("");
+  const [area, setArea] = useState<CaseCategory | "all">("all");
+  const areaSelectId = useId();
 
   const filteredAgents = useMemo(
-    () => agents.filter((agent) => matchesAgent(agent, query)),
-    [agents, query],
+    () =>
+      agents.filter(
+        (agent) => (area === "all" || agent.specialty === area) && matchesAgent(agent, query),
+      ),
+    [agents, area, query],
   );
 
-  const activeTicketCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const ticket of cases) {
-      if (ticket.status === "in-progress" && ticket.agentId) {
-        counts.set(ticket.agentId, (counts.get(ticket.agentId) ?? 0) + 1);
-      }
-    }
-    return counts;
-  }, [cases]);
+  const activeTicketCounts = useMemo(() => countActiveTickets(cases), [cases]);
 
   const columns = useMemo<Column<SupportAgent>[]>(() => {
     const getActiveCount = (agent: SupportAgent) => activeTicketCounts.get(agent.id) ?? 0;
@@ -78,19 +76,39 @@ export function AgentList() {
 
   return (
     <>
-      <SearchInput
-        label="Search agents"
-        placeholder="Name or email"
-        value={query}
-        onChange={setQuery}
-        resultSummary={`${filteredAgents.length} of ${agents.length} agents`}
-      />
+      <div className="toolbar">
+        <div className="filter">
+          <label className="filter__label" htmlFor={areaSelectId}>
+            Area
+          </label>
+          <select
+            id={areaSelectId}
+            className="select"
+            value={area}
+            onChange={(e) => setArea(e.target.value as CaseCategory | "all")}
+          >
+            <option value="all">All</option>
+            {(Object.keys(CATEGORY_MAP) as CaseCategory[]).map((category) => (
+              <option key={category} value={category}>
+                {CATEGORY_MAP[category].label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <SearchInput
+          label="Search agents"
+          placeholder="Name or email"
+          value={query}
+          onChange={setQuery}
+          resultSummary={`${filteredAgents.length} of ${agents.length} agents`}
+        />
+      </div>
       <SortableTable
         label="Agents"
         rows={filteredAgents}
         columns={columns}
         getRowKey={(agent) => agent.id}
-        emptyMessage="No results. Try a different search."
+        emptyMessage="No results. Try a different search or area."
       />
     </>
   );
