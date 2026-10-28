@@ -4,19 +4,19 @@ import { Sidebar, type Screen } from "./components/layout/sidebar";
 import { TicketList } from "./components/ticketList";
 import { AgentList } from "./components/agentList";
 import { AssignScreen } from "./components/assignScreen";
-import type { SupportCase } from "./types/supportCase";
+import { useSupportData } from "./context/supportData";
 import "./components/layout/appShell.css";
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>("dashboard");
-  const [selectedCase, setSelectedCase] = useState<SupportCase | null>(null);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const { cases } = useSupportData();
 
-  function handleSelectCase(supportCase: SupportCase) {
-    setSelectedCase(supportCase);
-  }
+  // Derived on every render, so the assign screen always shows the latest case data.
+  const selectedCase = cases.find((supportCase) => supportCase.id === selectedCaseId);
 
   function handleNavigate(screen: Screen) {
-    setSelectedCase(null);
+    setSelectedCaseId(null);
     setActiveScreen(screen);
   }
 
@@ -33,7 +33,7 @@ export default function App() {
       if (selectedCase) {
         return <AssignScreen supportCase={selectedCase} />;
       }
-      return <TicketList onSelectCase={handleSelectCase} />;
+      return <TicketList onSelectCase={setSelectedCaseId} />;
     }
 
     if (activeScreen === "agents") {

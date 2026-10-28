@@ -20,11 +20,12 @@ const PRIORITY_MAP: Record<string, { label: string; variant: BadgeProps["variant
 
 interface TicketCardProps {
   supportCase: SupportCase;
-  onSelect: (caseItem: SupportCase) => void;
+  agentName: string | undefined;
+  onSelect: (caseId: string) => void;
 }
 
-export function TicketCard({ supportCase, onSelect }: TicketCardProps) {
-  const { id, customer, subject, status, priority, agentId, updatedAt } = supportCase;
+export function TicketCard({ supportCase, agentName, onSelect }: TicketCardProps) {
+  const { id, customer, subject, status, priority, updatedAt } = supportCase;
   const statusInfo = STATUS_MAP[status];
   const priorityInfo = PRIORITY_MAP[priority];
 
@@ -32,7 +33,13 @@ export function TicketCard({ supportCase, onSelect }: TicketCardProps) {
     <Card
       padding="md"
       className="ticket-card"
-      onClick={() => onSelect(supportCase)}
+      onClick={() => onSelect(id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault(); // stop Space from scrolling the page
+          onSelect(id);
+        }
+      }}
       role="button"
       tabIndex={0}
     >
@@ -54,8 +61,8 @@ export function TicketCard({ supportCase, onSelect }: TicketCardProps) {
         </div>
         <div className="ticket-card__field">
           <span className="ticket-card__label">Agent</span>
-          <span className={cn("ticket-card__value", !agentId && "ticket-card__value--empty")}>
-            {agentId || "Unassigned"}
+          <span className={cn("ticket-card__value", !agentName && "ticket-card__value--empty")}>
+            {agentName ?? "Unassigned"}
           </span>
         </div>
         <div className="ticket-card__field">

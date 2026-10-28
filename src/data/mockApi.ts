@@ -2,7 +2,7 @@ import type { SupportAgent, SupportCase } from "@/types/supportCase";
 import dbCases from "./db.json";
 import { agents } from "./agents";
 
-const cases: SupportCase[] = (dbCases as unknown[]).map((raw) => {
+let cases: SupportCase[] = (dbCases as unknown[]).map((raw) => {
   const r = raw as Record<string, unknown>;
   return {
     ...r,
@@ -20,14 +20,16 @@ function waitForMockApi(): Promise<void> {
   });
 }
 
+// structuredClone keeps Date fields intact, so callers never hold references
+// into the internal store.
 export async function fetchCases(): Promise<SupportCase[]> {
   await waitForMockApi();
-  return cases;
+  return structuredClone(cases);
 }
 
 export async function fetchAgents(): Promise<SupportAgent[]> {
   await waitForMockApi();
-  return agents;
+  return structuredClone(agents);
 }
 
 export async function assignAgent(
@@ -58,8 +60,8 @@ export async function assignAgent(
     );
   }
 
-  targetCase.agentId = agentId;
-  targetCase.status = "in-progress";
+  const updatedCase: SupportCase = { ...targetCase, agentId, status: "in-progress" };
+  cases = cases.map((c) => (c.id === caseId ? updatedCase : c));
 
-  return targetCase;
+  return structuredClone(updatedCase);
 }

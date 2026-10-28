@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { SupportCase } from "@/types/supportCase";
-import { agents } from "@/data/agents";
-import { assignAgent } from "@/data/mockApi";
+import { useSupportData } from "@/context/supportData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +24,7 @@ interface AssignScreenProps {
 }
 
 export function AssignScreen({ supportCase }: AssignScreenProps) {
+  const { agents, assignAgent } = useSupportData();
   const [selectedAgentId, setSelectedAgentId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -32,6 +32,7 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
   const { id, subject, priority, category, status, agentId, description } = supportCase;
   const priorityInfo = PRIORITY_MAP[priority];
   const categoryInfo = CATEGORY_MAP[category];
+  const assignedAgent = agents.find((agent) => agent.id === agentId);
 
   async function handleAssign() {
     setError("");
@@ -57,7 +58,9 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
         <div className="assign-screen__meta">
           <span>Category: <Badge variant={categoryInfo.variant}>{categoryInfo.label}</Badge></span>
           <span>Status: {status}</span>
-          <span>Agent: {agentId || "Unassigned"}</span>
+          <span>
+            Agent: {assignedAgent ? `${assignedAgent.firstName} ${assignedAgent.lastName}` : "Unassigned"}
+          </span>
         </div>
 
         <p className="assign-screen__description">{description}</p>

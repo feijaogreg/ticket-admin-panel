@@ -1,53 +1,36 @@
-import { useState, useEffect } from "react";
-import type { SupportCase } from "@/types/supportCase";
-import { fetchCases } from "@/data/mockApi";
+import { useMemo } from "react";
+import { useSupportData } from "@/context/supportData";
 import { TicketCard } from "./ticketCard";
 
 interface TicketListProps {
-  onSelectCase: (caseItem: SupportCase) => void;
+  onSelectCase: (caseId: string) => void;
 }
 
 export function TicketList({ onSelectCase }: TicketListProps) {
-  const [tickets, setTickets] = useState<SupportCase[]>([]);
-  const [dataState, setDataState] = useState<"loading" | "error" | "ready">("loading");
-  const [errorMessage, setErrorMessage] = useState("");
+  const { cases: tickets, agents, status, error } = useSupportData();
 
-  useEffect(() => {
-    let cancelled = false;
+  const agentNames = useMemo(
+    () => new Map(agents.map((agent) => [agent.id, `${agent.firstName} ${agent.lastName}`])),
+    [agents],
+  );
 
-    setDataState("loading");
-    setErrorMessage("");
-
-    fetchCases()
-      .then((data) => {
-        if (!cancelled) {
-          setTickets(data);
-          setDataState("ready");
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setDataState("error");
-          setErrorMessage(
-            err instanceof Error ? err.message : "An unexpected error occurred",
-          );
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (dataState === "loading") {
+  if (status === "loading") {
     return null;
   }
 
-  if (dataState === "error" || tickets.length === 0) {
+  if (status === "error") {
     return (
       <div className="ticket-list-state">
         <p>Something went wrong.</p>
-        {errorMessage && <p>{errorMessage}</p>}
+        {error && <p>{error}</p>}
+      </div>
+    );
+  }
+
+  if (tickets.length === 0) {
+    return (
+      <div className="ticket-list-state">
+        <p>No tickets found.</p>
       </div>
     );
   }
@@ -55,7 +38,12 @@ export function TicketList({ onSelectCase }: TicketListProps) {
   return (
     <div className="ticket-list">
       {tickets.map((supportCase) => (
-        <TicketCard key={supportCase.id} supportCase={supportCase} onSelect={onSelectCase} />
+        <TicketCard
+          key={supportCase.id}
+          supportCase={supportCase}
+          agentName={supportCase.agentId ? agentNames.get(supportCase.agentId) : undefined}
+          onSelect={onSelectCase}
+        />
       ))}
     </div>
   );
