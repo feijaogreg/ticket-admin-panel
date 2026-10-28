@@ -14,6 +14,7 @@
 .page-header__title {
   font-size: var(--text-2xl);
   font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-tight);
   color: var(--color-text);
 }
 

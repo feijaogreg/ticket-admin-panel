@@ -54,13 +54,31 @@
   --color-surface-tertiary: var(--color-gray-100);
   --color-surface-elevated: var(--color-white);
   --color-text: var(--color-gray-900);
-  --color-text-secondary: var(--color-gray-500);
-  --color-text-tertiary: var(--color-gray-400);
+  /* gray-600/500 keep secondary text and icons readable on gray surfaces too. */
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-tertiary: var(--color-gray-500);
   --color-border: var(--color-gray-200);
   --color-border-strong: var(--color-gray-300);
   --color-primary: var(--color-blue-600);
   --color-primary-hover: var(--color-blue-700);
   --color-primary-subtle: var(--color-blue-50);
+  --color-success-text: var(--color-green-700);
+  --color-success-subtle: var(--color-green-50);
+  --color-success-border: var(--color-green-100);
+  --color-danger-text: var(--color-red-700);
+  --color-danger-subtle: var(--color-red-50);
+  --color-danger-border: var(--color-red-100);
+
+  /* Focus */
+  --focus-ring-color: var(--color-primary);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* Tables */
+  --table-header-bg: var(--color-surface-secondary);
+  --table-row-hover-bg: var(--color-surface-secondary);
+  --table-cell-padding-y: var(--space-2);
+  --table-cell-padding-x: var(--space-4);
 
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -84,6 +102,10 @@
   --text-lg: 1.125rem;
   --text-xl: 1.25rem;
   --text-2xl: 1.5rem;
+  /* Inputs use 16px on small screens so iOS doesn't zoom in on focus. */
+  --text-input-mobile: var(--text-base);
+  --tracking-tight: -0.01em;
+  --tracking-wide: 0.04em;
 
   --leading-tight: 1.25;
   --leading-normal: 1.5;
@@ -109,10 +131,18 @@
     0 4px 6px -4px rgba(0, 0, 0, 0.04);
 
   /* Transitions */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
+  --transition-press: 160ms var(--ease-out);
+  --press-scale: 0.97;
 
   /* Layout */
   --sidebar-width: 240px;
   --topbar-height: 56px;
+  --content-max-width-narrow: 640px;
+  --search-max-width: 360px;
+  --search-min-width: 200px;
+  --icon-sm: 16px;
+  --nav-indicator-width: 3px;
 }

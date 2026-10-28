@@ -32,16 +32,22 @@
     background-color var(--transition-fast),
     color var(--transition-fast);
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.sidebar__link:hover {
-  background: var(--color-surface-tertiary);
-  color: var(--color-text);
+@media (hover: hover) and (pointer: fine) {
+  .sidebar__link:hover {
+    background: var(--color-surface-tertiary);
+    color: var(--color-text);
+  }
 }
 
-.sidebar__link--active {
+/* An accent bar marks the current page in addition to the color change. */
+.sidebar__link--active,
+.sidebar__link--active:hover {
   background: var(--color-primary-subtle);
   color: var(--color-primary);
+  box-shadow: inset var(--nav-indicator-width) 0 0 var(--color-primary);
 }
 
 /* On small screens the sidebar becomes a horizontal bar under the top bar. */
@@ -56,5 +62,12 @@
   .sidebar__list {
     flex-direction: row;
     overflow-x: auto;
+    /* Room for the focus ring, which overflow would otherwise clip. */
+    padding: var(--focus-ring-offset);
+  }
+
+  .sidebar__link--active,
+  .sidebar__link--active:hover {
+    box-shadow: inset 0 calc(-1 * var(--nav-indicator-width)) 0 var(--color-primary);
   }
 }
