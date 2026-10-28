@@ -16,6 +16,10 @@
 }
 
 @media (max-width: 768px) {
+  .app-shell__body {
+    flex-direction: column;
+  }
+
   .app-shell__main {
     padding: var(--space-4);
   }

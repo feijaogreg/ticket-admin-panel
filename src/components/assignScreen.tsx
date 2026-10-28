@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { SupportAgent, SupportCase } from "@/types/supportCase";
 import { useSupportData } from "@/context/supportData";
 import { Card } from "@/components/ui/card";
@@ -25,6 +25,13 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isAssigning, setIsAssigning] = useState(false);
+  const successRef = useRef<HTMLParagraphElement>(null);
+
+  // The form (and its focused Assign button) unmounts on success, so move focus to the
+  // result; that also makes screen readers read it out.
+  useEffect(() => {
+    if (success) successRef.current?.focus();
+  }, [success]);
 
   const { id, subject, priority, category, status, agentId, description, customer, deadline } =
     supportCase;
@@ -153,7 +160,9 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
       ) : (
         <Card padding="md" className="assign-screen__form">
           {success ? (
-            <p className="assign-screen__success">{success}</p>
+            <p ref={successRef} tabIndex={-1} className="assign-screen__success">
+              {success}
+            </p>
           ) : (
             <p className="assign-screen__assigned">
               {status === "closed" && "This ticket is closed. "}
@@ -162,6 +171,8 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
                   {status === "closed" ? "It was handled by " : "Assigned to "}
                   <strong>{fullName(assignedAgent)}</strong>.
                 </>
+              ) : agentId ? (
+                "Assigned to an unknown agent."
               ) : (
                 "No agent is assigned."
               )}
@@ -169,11 +180,6 @@ export function AssignScreen({ supportCase }: AssignScreenProps) {
           )}
         </Card>
       )}
-
-      {/* Always mounted so screen readers announce the success message when it appears. */}
-      <p className="sr-only" role="status">
-        {success}
-      </p>
     </div>
   );
 }

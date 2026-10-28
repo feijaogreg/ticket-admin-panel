@@ -60,7 +60,12 @@ export async function assignAgent(
     );
   }
 
-  const updatedCase: SupportCase = { ...targetCase, agentId, status: "in-progress" };
+  const updatedCase: SupportCase = {
+    ...targetCase,
+    agentId,
+    status: "in-progress",
+    updatedAt: new Date(),
+  };
   cases = cases.map((c) => (c.id === caseId ? updatedCase : c));
 
   return structuredClone(updatedCase);

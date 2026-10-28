@@ -86,7 +86,10 @@ export function TicketList({ onSelectCase }: TicketListProps) {
       {
         key: "agent",
         header: "Agent",
-        cell: (ticket) => getAgentName(ticket) ?? <span className="table__muted">Unassigned</span>,
+        cell: (ticket) =>
+          getAgentName(ticket) ?? (
+            <span className="table__muted">{ticket.agentId ? "Unknown agent" : "Unassigned"}</span>
+          ),
         sortValue: getAgentName,
       },
       {
