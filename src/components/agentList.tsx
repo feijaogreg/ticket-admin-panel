@@ -1,9 +1,60 @@
+import { useMemo } from "react";
+import type { SupportAgent } from "@/types/supportCase";
 import { useSupportData } from "@/context/supportData";
+import { Badge } from "@/components/ui/badge";
+import { SortableTable } from "@/components/ui/sortableTable";
+import type { Column } from "@/components/ui/sortableTable";
+import { CATEGORY_MAP } from "@/lib/badgeMaps";
 import { EmptyState, ErrorState, LoadingState } from "./dataState";
-import { AgentCard } from "./agentCard";
 
 export function AgentList() {
-  const { agents, status, error, reload } = useSupportData();
+  const { agents, cases, status, error, reload } = useSupportData();
+
+  const activeTicketCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const ticket of cases) {
+      if (ticket.status === "in-progress" && ticket.agentId) {
+        counts.set(ticket.agentId, (counts.get(ticket.agentId) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [cases]);
+
+  const columns = useMemo<Column<SupportAgent>[]>(() => {
+    const getActiveCount = (agent: SupportAgent) => activeTicketCounts.get(agent.id) ?? 0;
+
+    return [
+      {
+        key: "name",
+        header: "Name",
+        cell: (agent) => `${agent.firstName} ${agent.lastName}`,
+        sortValue: (agent) => `${agent.firstName} ${agent.lastName}`,
+      },
+      {
+        key: "email",
+        header: "Email",
+        cell: (agent) => agent.email,
+        sortValue: (agent) => agent.email,
+      },
+      {
+        key: "area",
+        header: "Area",
+        cell: (agent) => (
+          <Badge variant={CATEGORY_MAP[agent.specialty].variant}>
+            {CATEGORY_MAP[agent.specialty].label}
+          </Badge>
+        ),
+        sortValue: (agent) => CATEGORY_MAP[agent.specialty].label,
+      },
+      {
+        key: "activeTickets",
+        header: "Active tickets",
+        align: "end",
+        cell: getActiveCount,
+        sortValue: getActiveCount,
+      },
+    ];
+  }, [activeTicketCounts]);
 
   if (status === "loading") {
     return <LoadingState />;
@@ -18,10 +69,11 @@ export function AgentList() {
   }
 
   return (
-    <div className="agent-list">
-      {agents.map((agent) => (
-        <AgentCard key={agent.id} agent={agent} />
-      ))}
-    </div>
+    <SortableTable
+      label="Agents"
+      rows={agents}
+      columns={columns}
+      getRowKey={(agent) => agent.id}
+    />
   );
 }

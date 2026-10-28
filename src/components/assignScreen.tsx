@@ -5,20 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import type { BadgeProps } from "@/components/ui/badge";
-
-const PRIORITY_MAP: Record<string, { label: string; variant: BadgeProps["variant"] }> = {
-  low: { label: "Low", variant: "neutral" },
-  medium: { label: "Medium", variant: "default" },
-  high: { label: "High", variant: "warning" },
-  critical: { label: "Critical", variant: "danger" },
-};
-
-const CATEGORY_MAP: Record<string, { label: string; variant: BadgeProps["variant"] }> = {
-  billing: { label: "Billing", variant: "default" },
-  technical: { label: "Technical", variant: "warning" },
-  account: { label: "Account", variant: "success" },
-};
+import { CATEGORY_MAP, PRIORITY_MAP } from "@/lib/badgeMaps";
 
 interface AssignScreenProps {
   supportCase: SupportCase;
