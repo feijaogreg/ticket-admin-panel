@@ -265,3 +265,57 @@ button {
   background: var(--color-success-subtle);
   border-color: var(--color-success-border);
 }
+
+/* Dashboard */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--stat-card-min-width), 1fr));
+  gap: var(--space-4);
+}
+
+.dashboard__stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.dashboard__stat-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+}
+
+.dashboard__stat-value {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.dashboard__panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--dashboard-panel-min-width)), 1fr));
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.dashboard__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.dashboard__heading {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}

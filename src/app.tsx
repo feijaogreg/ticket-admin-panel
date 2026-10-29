@@ -5,6 +5,7 @@ import { Sidebar, type Screen } from "./components/layout/sidebar";
 import { TicketList } from "./components/ticketList";
 import { AgentList } from "./components/agentList";
 import { AssignScreen } from "./components/assignScreen";
+import { Dashboard } from "./components/dashboard";
 import { useSupportData } from "./context/supportData";
 import "./components/layout/appShell.css";
 
@@ -28,9 +29,7 @@ export default function App() {
       return (
         <>
           <PageHeader title="Dashboard" />
-          <div className="ticket-list-state">
-            <p>Dashboard — coming soon</p>
-          </div>
+          <Dashboard />
         </>
       );
     }
